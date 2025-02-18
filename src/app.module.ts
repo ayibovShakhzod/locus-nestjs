@@ -2,9 +2,26 @@ import { Module } from '@nestjs/common';
 import { EnvironmentConfigModule } from './infrastructure/config/environment-config/environment-config.module';
 import { UsecasesProxyModule } from './infrastructure/usecases-proxy/usecases-proxy.module';
 import { ControllersModule } from './infrastructure/controllers/controllers.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { BcryptModule } from './infrastructure/services/bcrypt/bcrypt.module';
+import { JwtModule as JwtServiceModule } from './infrastructure/services/jwt/jwt.module';
+import { LocalStrategy } from './infrastructure/common/strategies/local.strategy';
+import { JwtStrategy } from './infrastructure/common/strategies/jwt.strategy';
+import { JwtRefreshTokenStrategy } from './infrastructure/common/strategies/jwtRefresh.strategy';
 
 @Module({
-  imports: [UsecasesProxyModule.register(), ControllersModule, EnvironmentConfigModule],
-  providers: [],
+  imports: [
+    PassportModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+    }),
+    UsecasesProxyModule.register(),
+    ControllersModule,
+    BcryptModule,
+    JwtServiceModule,
+    EnvironmentConfigModule,
+  ],
+  providers: [LocalStrategy, JwtStrategy, JwtRefreshTokenStrategy],
 })
 export class AppModule {}

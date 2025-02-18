@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LocusRepository } from 'src/domain/repositories/locusRepository.interface';
-import { Locus } from '../../entities/locus.entity';
+import { Locus } from '../../entities/locus';
 import { Repository } from 'typeorm';
 import { LocusM } from 'src/domain/model/locus';
 

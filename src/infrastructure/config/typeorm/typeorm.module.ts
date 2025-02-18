@@ -10,8 +10,13 @@ export const getTypeOrmModuleOptions = (config: EnvironMentConfigService): TypeO
   username: config.getDatabaseUser(),
   password: config.getDatabasePassword(),
   database: config.getDatabaseName(),
-  synchronize: config.getDatabaseSync(),
+  synchronize: false,
   logNotifications: true,
+  logging: 'all',
+  entities: [__dirname + './../../**/*.entity{.ts,.js}'],
+  schema: 'public',
+  migrationsRun: true,
+  migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
 });
 
 @Module({

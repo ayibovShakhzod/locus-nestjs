@@ -12,7 +12,7 @@ import { ApiResponseType } from 'src/infrastructure/common/swagger/response.deco
 @ApiExtraModels(LocusPresenter)
 export class LocusController {
   constructor(
-    @Inject(UsecasesProxyModule.GET_LOCUS)
+    @Inject(UsecasesProxyModule.GET_LOCUS_USECASES_PROXY)
     private readonly getLocusUsecasesProxy: UseCaseProxy<getLocusUseCases>,
   ) {}
 

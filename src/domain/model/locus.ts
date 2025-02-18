@@ -1,4 +1,4 @@
-import { Locus } from '../../infrastructure/entities/locus.entity';
+import { Locus } from '../../infrastructure/entities/locus';
 import { LocusMemberM } from './locus-member';
 export class LocusM {
   id: number;
