@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
-import { LocusRepositoryModule } from './locus/locus.repository.module';
-import { TypeOrmConfigModule } from '../config/typeorm/typeorm.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DatabaseUserRepository } from './user.repository';
+import { TypeOrmConfigModule } from '../config/typeorm/typeorm.module';
 import { User } from '../entities/user.entity';
-import { DatabaseRoleRepository } from './role.repository';
+import { DatabaseUserRepository } from './user.repository';
 import { Role } from '../entities/role.entity';
+import { DatabaseRoleRepository } from './role.repository';
+import { LocusRepositoryModule } from './locus/locus.repository.module';
 
 @Module({
-  imports: [LocusRepositoryModule, TypeOrmConfigModule, TypeOrmModule.forFeature([User, Role])],
+  imports: [TypeOrmConfigModule, TypeOrmModule.forFeature([User, Role]), LocusRepositoryModule],
   providers: [DatabaseUserRepository, DatabaseRoleRepository],
-  exports: [DatabaseUserRepository, DatabaseRoleRepository, LocusRepositoryModule],
+  exports: [DatabaseUserRepository, DatabaseRoleRepository],
 })
 export class RepositoriesModule {}

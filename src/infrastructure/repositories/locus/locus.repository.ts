@@ -8,7 +8,7 @@ import { LocusM } from 'src/domain/model/locus';
 @Injectable()
 export class DatabaseLocusRepository implements LocusRepository {
   constructor(
-    @InjectRepository(Locus)
+    @InjectRepository(Locus, 'locus-database')
     private readonly locusEntityRepository: Repository<Locus>,
   ) {}
 
@@ -25,7 +25,6 @@ FROM paginated_rl rl
 LEFT JOIN rnc_locus_members rlm ON rlm.locus_id = rl.id
 GROUP BY rl.id, rl.assembly_id, rl.locus_name, rl.public_locus_name, rl.chromosome, rl.strand, rl.locus_start, rl.locus_stop, rl.member_count
     `;
-
     const locusEntities = await this.locusEntityRepository.query(query);
     const result = locusEntities.map(locusEntity => ({
       ...new LocusM(locusEntity, locusEntity.locus_members),

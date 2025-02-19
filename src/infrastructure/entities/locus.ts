@@ -1,6 +1,8 @@
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity({
+  database: 'locus-database',
+})
 export class Locus {
   @PrimaryGeneratedColumn({ type: 'integer' })
   id: number;

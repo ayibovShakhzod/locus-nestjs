@@ -1,7 +1,8 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
-import { ApiProperty } from '@nestjs/swagger';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
-import { map, Observable } from 'rxjs';
+import { ApiProperty } from '@nestjs/swagger';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export class ResponseFormat<T> {
   @ApiProperty()
@@ -15,21 +16,19 @@ export class ResponseFormat<T> {
 }
 
 @Injectable()
-export class ResponseInterceptor<T> implements NestInterceptor<Text, ResponseFormat<T>> {
+export class ResponseInterceptor<T> implements NestInterceptor<T, ResponseFormat<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<ResponseFormat<T>> {
     const now = Date.now();
     const httpContext = context.switchToHttp();
     const request = httpContext.getRequest<FastifyRequest>();
 
     return next.handle().pipe(
-      map(data => {
-        return {
-          data,
-          path: request.url,
-          duration: `${Date.now() - now}ms`,
-          method: request.method,
-        };
-      }),
+      map(data => ({
+        data,
+        path: request.url,
+        duration: `${Date.now() - now}ms`,
+        method: request.method,
+      })),
     );
   }
 }

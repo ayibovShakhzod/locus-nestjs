@@ -1,9 +1,9 @@
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { EnvironMentConfigService } from '../environment-config/environment-config.service';
+import { EnvironmentConfigService } from '../environment-config/environment-config.service';
 import { Module } from '@nestjs/common';
 import { EnvironmentConfigModule } from '../environment-config/environment-config.module';
 
-export const getTypeOrmModuleOptions = (config: EnvironMentConfigService): TypeOrmModuleOptions => ({
+export const getTypeOrmModuleOptions = (config: EnvironmentConfigService): TypeOrmModuleOptions => ({
   type: 'postgres',
   host: config.getLocusDatabaseHost(),
   port: config.getLocusDatabasePort(),
@@ -18,7 +18,8 @@ export const getTypeOrmModuleOptions = (config: EnvironMentConfigService): TypeO
   imports: [
     TypeOrmModule.forRootAsync({
       imports: [EnvironmentConfigModule],
-      inject: [EnvironMentConfigService],
+      name: 'locus-database',
+      inject: [EnvironmentConfigService],
       useFactory: getTypeOrmModuleOptions,
     }),
   ],

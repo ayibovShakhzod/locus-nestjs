@@ -1,4 +1,13 @@
-import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Role } from './role.entity';
 
 @Entity()
@@ -13,12 +22,16 @@ export class User {
   @Column('text')
   password: string;
 
-  @Column('text')
-  email: string;
+  @CreateDateColumn({ name: 'createdate' })
+  createdate: Date;
 
-  @ManyToOne(() => Role, role => role.users)
-  role: Role;
+  @UpdateDateColumn({ name: 'updateddate' })
+  updateddate: Date;
 
   @Column('varchar', { nullable: true })
-  hash_refresh_token: string;
+  hach_refresh_token: string;
+
+  @ManyToOne(() => Role, role => role.users)
+  @JoinColumn({ name: 'roleId' })
+  role: Role;
 }

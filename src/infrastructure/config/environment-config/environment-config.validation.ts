@@ -2,9 +2,10 @@ import { plainToClass } from 'class-transformer';
 import { IsBoolean, IsEnum, IsNumber, IsString, validateSync } from 'class-validator';
 
 enum Environment {
-  Local = 'local',
   Development = 'development',
   Production = 'production',
+  Local = 'local',
+  Test = 'test',
 }
 
 class EnvironmentVariables {
@@ -30,12 +31,14 @@ class EnvironmentVariables {
   DATABASE_PASSWORD: string;
   @IsString()
   DATABASE_NAME: string;
+  @IsString()
+  DATABASE_SCHEMA: string;
   @IsBoolean()
   DATABASE_SYNCHRONIZE: boolean;
 }
 
-export const validate = (config: Record<string, unknown>): EnvironmentVariables => {
-  const validatedConfig: EnvironmentVariables = plainToClass(EnvironmentVariables, config, {
+export function validate(config: Record<string, unknown>) {
+  const validatedConfig = plainToClass(EnvironmentVariables, config, {
     enableImplicitConversion: true,
   });
   const errors = validateSync(validatedConfig, { skipMissingProperties: false });
@@ -43,6 +46,5 @@ export const validate = (config: Record<string, unknown>): EnvironmentVariables 
   if (errors.length > 0) {
     throw new Error(errors.toString());
   }
-
   return validatedConfig;
-};
+}

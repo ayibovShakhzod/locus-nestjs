@@ -5,7 +5,7 @@ import { Locus } from 'src/infrastructure/entities/locus';
 import { DatabaseLocusRepository } from './locus.repository';
 
 @Module({
-  imports: [LocusTypeOrmConfigModule, TypeOrmModule.forFeature([Locus])],
+  imports: [LocusTypeOrmConfigModule, TypeOrmModule.forFeature([Locus], 'locus-database')],
   providers: [DatabaseLocusRepository],
   exports: [DatabaseLocusRepository],
 })

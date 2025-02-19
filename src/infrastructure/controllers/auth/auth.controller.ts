@@ -1,27 +1,27 @@
 import { Body, Controller, Inject, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiExtraModels, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { IsAuthPresenter } from './auth.presenter';
-import { UsecasesProxyModule } from 'src/infrastructure/usecases-proxy/usecases-proxy.module';
-import { UseCaseProxy } from 'src/infrastructure/usecases-proxy/usecases-proxy';
-import { LoginGuard } from 'src/infrastructure/common/guards/login.guard';
+
 import { AuthLoginDto } from './auth-dto.class';
-import { LoginUseCases } from 'src/usecases/auth/login.usecases';
+import { IsAuthPresenter } from './auth.presenter';
+
+import { LoginGuard } from '../../common/guards/login.guard';
+
+import { UseCaseProxy } from '../../usecases-proxy/usecases-proxy';
+import { UsecasesProxyModule } from '../../usecases-proxy/usecases-proxy.module';
+import { LoginUseCases } from '../../../usecases/auth/login.usecases';
 
 @Controller('auth')
 @ApiTags('auth')
 @ApiResponse({
   status: 401,
-  description: 'No autorization token was found',
+  description: 'No authorization token was found',
 })
-@ApiResponse({
-  status: 500,
-  description: 'Internal server error',
-})
+@ApiResponse({ status: 500, description: 'Internal error' })
 @ApiExtraModels(IsAuthPresenter)
 export class AuthController {
   constructor(
-    @Inject(UsecasesProxyModule.LOGIN_USESCASES_PROXY)
-    private readonly loginUsecasesProxy: UseCaseProxy<LoginUseCases>,
+    @Inject(UsecasesProxyModule.LOGIN_USECASES_PROXY)
+    private readonly loginUsecaseProxy: UseCaseProxy<LoginUseCases>,
   ) {}
 
   @Post('login')
@@ -29,10 +29,9 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiBody({ type: AuthLoginDto })
   @ApiOperation({ description: 'login' })
-  login(@Body() auth: AuthLoginDto) {
-    console.log('🚀 ~ AuthController ~ login ~ auth:', auth);
-    const accessTokenInfo = this.loginUsecasesProxy.getInstance().getJwtToken(auth.username);
-    const refreshTokenInfo = this.loginUsecasesProxy.getInstance().getJwtRefreshToken(auth.username);
+  async login(@Body() auth: AuthLoginDto) {
+    const accessTokenInfo = await this.loginUsecaseProxy.getInstance().getJwtToken(auth.username);
+    const refreshTokenInfo = await this.loginUsecaseProxy.getInstance().getJwtRefreshToken(auth.username);
 
     return {
       accessToken: accessTokenInfo.token,

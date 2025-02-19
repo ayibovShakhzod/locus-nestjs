@@ -4,25 +4,29 @@ import { Inject, Injectable } from '@nestjs/common';
 import { UsecasesProxyModule } from '../../usecases-proxy/usecases-proxy.module';
 import { UseCaseProxy } from '../../usecases-proxy/usecases-proxy';
 import { LoginUseCases } from '../../../usecases/auth/login.usecases';
+import { LoggerService } from '../../logger/logger.service';
+import { ExceptionsService } from '../../exceptions/exceptions.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(
-    @Inject(UsecasesProxyModule.LOGIN_USESCASES_PROXY)
+    @Inject(UsecasesProxyModule.LOGIN_USECASES_PROXY)
     private readonly loginUsecaseProxy: UseCaseProxy<LoginUseCases>,
+    private readonly logger: LoggerService,
+    private readonly exceptionService: ExceptionsService,
   ) {
     super();
   }
 
   async validate(username: string, password: string) {
-    console.log('🚀 ~ LocalStrategy ~ validate ~ username:', username);
     if (!username || !password) {
-      console.log('LocalStrategy', `Username or password is missing, BadRequestException`);
+      this.logger.warn('LocalStrategy', `Username or password is missing, BadRequestException`);
+      this.exceptionService.UnauthorizedException();
     }
-
     const user = await this.loginUsecaseProxy.getInstance().validateUserForLocalStragtegy(username, password);
     if (!user) {
-      console.log('LocalStrategy', `Invalid username or password`);
+      this.logger.warn('LocalStrategy', `Invalid username or password`);
+      this.exceptionService.UnauthorizedException({ message: 'Invalid username or password.' });
     }
     return user;
   }
