@@ -32,7 +32,6 @@ import { LocusRepositoryModule } from '../repositories/locus/locus.repository.mo
   ],
 })
 export class UsecasesProxyModule {
-  // Auth
   static LOGIN_USECASES_PROXY = 'LoginUseCasesProxy';
   static GET_LOCUS_USECASES_PROXY = 'GetLocusUseCasesProxy';
 

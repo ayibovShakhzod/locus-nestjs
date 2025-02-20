@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LocusRepository } from 'src/domain/repositories/locusRepository.interface';
-import { Locus } from '../../entities/locus';
+import { Locus } from '../../entities/locus.entity';
 import { Repository } from 'typeorm';
-import { LocusM } from 'src/domain/model/locus';
+import { LocusFilterDto } from 'src/infrastructure/controllers/locus/locus-filter.dto';
+import { RoleEnum } from 'src/infrastructure/entities/role.enum';
 
 @Injectable()
 export class DatabaseLocusRepository implements LocusRepository {
@@ -12,24 +13,36 @@ export class DatabaseLocusRepository implements LocusRepository {
     private readonly locusEntityRepository: Repository<Locus>,
   ) {}
 
-  async findAll(): Promise<LocusM[]> {
-    const query = `WITH paginated_rl AS (
-    SELECT * FROM rnc_locus
-    ORDER BY id
-    LIMIT 10 OFFSET 0
-)
-SELECT 
-    rl.*, 
-    COALESCE(json_agg(rlm) FILTER (WHERE rlm.id IS NOT NULL), '[]') AS locus_members
-FROM paginated_rl rl
-LEFT JOIN rnc_locus_members rlm ON rlm.locus_id = rl.id
-GROUP BY rl.id, rl.assembly_id, rl.locus_name, rl.public_locus_name, rl.chromosome, rl.strand, rl.locus_start, rl.locus_stop, rl.member_count
-    `;
-    const locusEntities = await this.locusEntityRepository.query(query);
-    const result = locusEntities.map(locusEntity => ({
-      ...new LocusM(locusEntity, locusEntity.locus_members),
-    }));
+  async findAll(filterDto: LocusFilterDto, userRole: RoleEnum): Promise<Locus[]> {
+    const { id, assemblyId, regionId, membershipStatus, sideloading, page, rows, sortBy, sortOrder } = filterDto;
+    const query = this.locusEntityRepository
+      .createQueryBuilder('locus')
+      .leftJoinAndSelect('locus.locusMembers', 'locusMembers');
 
-    return result;
+    if (id) query.andWhere('locus.id = :id', { id });
+    if (assemblyId) query.andWhere('locus.assemblyId = :assemblyId', { assemblyId });
+    if (regionId) query.andWhere('locusMembers.regionId = :regionId', { regionId });
+    if (membershipStatus) query.andWhere('locusMembers.membershipStatus = :membershipStatus', { membershipStatus });
+
+    if (userRole === RoleEnum.NORMAL) {
+      query.select(['locus.id', 'locus.assemblyId']);
+    } else if (userRole === RoleEnum.LIMITED) {
+      query.andWhere('locusMembers.regionId IN (:...regionIds)', {
+        regionIds: [86118093, 86696489, 88186467],
+      });
+    }
+
+    if (sideloading && userRole !== RoleEnum.NORMAL) {
+      query.leftJoinAndSelect('locus.locusMembers', 'locusMembers');
+    }
+
+    if (sortBy) {
+      query.orderBy(`locus.${sortBy}`, sortOrder);
+    }
+
+    return query
+      .skip((page - 1) * rows)
+      .take(rows)
+      .getMany();
   }
 }

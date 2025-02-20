@@ -10,8 +10,9 @@ export const getTypeOrmModuleOptions = (config: EnvironmentConfigService): TypeO
   username: config.getLocusDatabaseUser(),
   password: config.getLocusDatabasePassword(),
   database: config.getLocusDatabaseName(),
-  synchronize: config.getLocusDatabaseSync(),
   logNotifications: true,
+  synchronize: false,
+  autoLoadEntities: true,
 });
 
 @Module({

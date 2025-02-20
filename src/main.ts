@@ -11,7 +11,6 @@ import { AllExceptionFilter } from './infrastructure/common/filter/exception.fil
 async function bootstrap() {
   const env = process.env.NODE_ENV;
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
-
   // Filter
   app.useGlobalFilters(new AllExceptionFilter(new LoggerService()));
 

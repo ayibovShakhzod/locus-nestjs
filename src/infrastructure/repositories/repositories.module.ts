@@ -10,6 +10,6 @@ import { LocusRepositoryModule } from './locus/locus.repository.module';
 @Module({
   imports: [TypeOrmConfigModule, TypeOrmModule.forFeature([User, Role]), LocusRepositoryModule],
   providers: [DatabaseUserRepository, DatabaseRoleRepository],
-  exports: [DatabaseUserRepository, DatabaseRoleRepository],
+  exports: [DatabaseUserRepository, DatabaseRoleRepository, LocusRepositoryModule],
 })
 export class RepositoriesModule {}

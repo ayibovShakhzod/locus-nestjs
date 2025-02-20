@@ -1,7 +1,6 @@
 import { Request } from 'express';
-import { User } from 'src/infrastructure/entities/user.entity';
+import { UserM } from 'src/domain/model/user';
 
 export interface AuthRequest extends Request {
-  user: User;
+  user: UserM;
 }
-˚
